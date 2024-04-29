@@ -11,11 +11,17 @@
   },
   "dependencies": {
     "axios": "^1.6.8",
-    "bulma-switch": "^2.0.4",
+    "framer-motion": "^11.1.7",
+    "gsap": "^3.12.5",
     "jwt-decode": "^4.0.0",
+    "papaparse": "^5.4.1",
     "react": "^18.2.0",
+    "react-datepicker": "^6.9.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.3"
+    "react-hook-form": "^7.51.3",
+    "react-icons": "^5.1.0",
+    "react-router-dom": "^6.22.3",
+    "sweetalert2": "^11.10.8"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
@@ -26,5 +32,9 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "vite": "^5.2.0"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "vite.config.js",
+  "author": "",
+  "license": "ISC"
 }

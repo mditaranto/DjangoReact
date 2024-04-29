@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from "../../api";
-//import styles/Modal.css";
+//import "../styles/Modal.css";
 import { Input } from './Input';
 import { FormProvider, useForm } from 'react-hook-form'
-import { Navigate } from 'react-router-dom';
 
 function ModalEdit({ formData, closeModal, isActive }) {
     const methods = useForm()
@@ -13,7 +12,6 @@ function ModalEdit({ formData, closeModal, isActive }) {
     useEffect(() => {
         if (formData)
             setFormData(formData);
-
     }, [formData]); // Fetch the order data when the component mounts
 
 
@@ -28,13 +26,10 @@ function ModalEdit({ formData, closeModal, isActive }) {
         api.put(`/api/orders/${orderId}/`, formData2)
             .then((res) => {
                 alert('Order updated successfully')
-
-                window.location.reload()
             })
             .catch((err) => alert(err))
 
-        closeModal();  
-
+        closeModal();
     })
 
     return (
@@ -47,183 +42,187 @@ function ModalEdit({ formData, closeModal, isActive }) {
                 </header>
                 <section style={{ margin: 0 }} className="modal-card-body">
                     <FormProvider {...methods}>
-                        <form onSubmit={e => e.preventDefault()} noValidate className="box p-5" style={{margin:0}}>
-                            {/* Formulario */}
-                            <div className="field mb-4 is-grouped" style={{ justifyContent: 'space-between' }}>
+                        <form onSubmit={e => e.preventDefault()}
+                            noValidate>
+                            {/* Nombre del cliente */}
+                            <div className="field" style={{ flexDirection: 'row', display: 'flex', justifyContent: 'space-between' }}>
                                 <Input
-                                    label="Nome"
+                                    label="nome"
                                     type="text"
                                     name="nameCustomer"
                                     placeholder="Nome"
-                                    value={formData2.nameCustomer || ''}
+                                    value={formData2.nameCustomer || ""}
                                     onChange={handleChange}
                                 />
-                                <div className="flex flex-col w-full gap-2">
-                                    <label htmlFor="Cognome" className="label is-small" style={{bottom:5.25}}>
-                                        Cognome
-                                    </label>
-                                    <input
-                                        className='input is-medium'
-                                        type="text"
-                                        name="surnameCustomer"
-                                        placeholder="Cognome"
-                                        value={formData2.surnameCustomer || ''}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                            </div>
 
-                            <div className="field mb-4">
-                                <label htmlFor="Telefono" className="label is-small">
-                                    Telefono
-                                </label>
-                                <input
-                                    className='input is-medium'
-                                    type="text"
-                                    name="phoneNumber"
-                                    placeholder="Telefono"
-                                    value={formData2.phoneNumber || ''}
-                                    onChange={handleChange}
-                                    pattern="[0-9]*"
-                                />
-                            </div>
-
-                            <div className="field mb-4">
                                 <Input
-                                    label="Modello di telefono"
+                                    label="cognome"
                                     type="text"
-                                    name="modelPhone"
-                                    placeholder="Modello di telefono"
-                                    value={formData2.modelPhone || ''}
+                                    name="surnameCustomer"
+                                    placeholder='Cognome'
+                                    value={formData2.surnameCustomer || ""}
                                     onChange={handleChange}
                                 />
                             </div>
 
-                            <div className="field mb-4">
-                                <Input
-                                    label="Defetto"
-                                    type="text"
-                                    name="defect"
-                                    placeholder="Defetto"
-                                    value={formData2.defect || ''}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-
-                            {/* Campos de "Pezzo" y "Costo" en el mismo div */}
-                            <div className="field mb-4 is-grouped" style={{ justifyContent: 'space-between' }}>
-                                <div className="flex flex-col w-full gap-2">
-                                    <label htmlFor="Pezzo" className="label is-small">
-                                        Pezzo
-                                    </label>
-                                    <input
-                                        className='input is-medium'
-                                        type="text"
-                                        name="pieceName"
-                                        placeholder="Pezzo"
-                                        value={formData2.pieceName || ''}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="flex flex-col w-full gap-2">
-                                    <label htmlFor="Costo" className="label is-small">
-                                        Costo
-                                    </label>
-                                    <input
-                                        className='input is-medium'
-                                        placeholder="Costo"
-                                        type="number"
-                                        name="price"
-                                        value={formData2.price || 0}
-                                        onChange={handleChange}
-                                        min={0}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Campos de selección */}
-                            <div className="field mb-4">
-                                <div className="columns is-variable is-8">
-                                    <div className="column">
-                                        <label className="label is-small">Stato</label>
-                                        <div className="control">
-                                            <div className='select is-fullwidth is-medium'>
-                                                <select
-                                                    name="status"
-                                                    value={formData2.status || ''}
-                                                    onChange={handleChange}
-                                                >
-                                                    <option value="0">Pending</option>
-                                                    <option value="1">In Progress</option>
-                                                    <option value="2">Finished</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="column">
-                                        <label className="label is-small">Spedito</label>
-                                        <div className="control">
-                                            <div className="select is-fullwidth is-medium">
-                                                <select
-                                                    name="shipped"
-                                                    value={formData2.shipped || ''}
-                                                    onChange={handleChange}
-                                                >
-                                                    <option value="0">No</option>
-                                                    <option value="1">Yes</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Campo de notas */}
-                            <div className="field mb-4">
-                                <label className="label is-small">Note</label>
+                            <div className="field">
                                 <div className="control">
-                                    <textarea
-                                        className="textarea is-medium"
-                                        name="notes"
-                                        value={formData2.notes || ''}
+                                    <Input
+                                        label={"Telefono:"}
+                                        type="text"
+                                        name="phoneNumber"
+                                        placeholder='Telefono'
+                                        value={formData2.phoneNumber || ""}
                                         onChange={handleChange}
-                                        placeholder="Enter notes..."
+                                        pattern="[0-9]*" // Solo permite números
+
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="field">
+                                <div className="control">
+                                    <Input
+                                        label={"Modello"}
+                                        type="text"
+                                        name="modelPhone"
+                                        placeholder='Modello'
+                                        value={formData2.modelPhone || ""}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="field mb-4">
+                                <Input
+                                    label="Marchio"
+                                    type="text"
+                                    name="brandPhone"
+                                    placeholder="Marchio"
+                                    value={formData.brandPhone || ''}
+                                    onChange={handleChange}
+                                />
+                            </div>
+
+                            <div className="field">
+                                <div className="control">
+                                    <Input
+                                        label={"Defetto:"}
+                                        type="text"
+                                        name="defect"
+                                        placeholder='Defetto'
+                                        value={formData2.defect || ""}
+                                        onChange={handleChange}
                                         required
                                     />
                                 </div>
                             </div>
 
-                            {/* Checkboxes */}
-                            <div className="field mb-4 is-grouped is-justify-content-space-between">
-                                <div className="control ml-1">
-                                    <label className="checkbox">
-                                        Garanzia
+                            <div className="field">
+                                <div className="control">
+                                    <Input
+                                        label={"Pezzo"}
+                                        type="text"
+                                        name="pieceName"
+                                        placeholder='Pezzo'
+                                        value={formData2.pieceName || ""}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="field">
+                                <div className="control">
+                                    <Input
+                                        label={"Costo"}
+                                        placeholder={"Costo"}
+                                        type="number"
+                                        name="price"
+                                        value={formData2.price || ""}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="field">
+                                <label className="label is-small">Stato:</label>
+                                <div className="control">
+                                    <div className="select" style={{ color: 'black' }}>
+                                        <select
+                                            name="status"
+                                            value={formData2.status || ""}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="0">Pending</option>
+                                            <option value="1">In Progress</option>
+                                            <option value="2">Finished</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="field">
+                                <label className="label is-small">Spedito:</label>
+                                <div className="control">
+                                    <div className="select">
+                                        <select
+                                            name="shipped"
+                                            value={formData2.shipped || ""}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="field">
+                                <label className="label is-small">Note:</label>
+                                <div className="control">
+                                    <textarea
+                                        className="textarea"
+                                        name="notes"
+                                        value={formData2.notes || ""}
+                                        onChange={handleChange}
+                                        placeholder='Enter notes...'
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="field">
+                                <div className="control" style={{ minWidth: 100 }}>
+                                    <label className="checkbox" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                        Garanzia:
                                         <input
                                             type="checkbox"
                                             name="guarantee"
                                             checked={formData2.guarantee || false}
                                             onChange={handleChange}
-                                            className='ml-2'
+                                            style={{ maxWidth: 50, margin: 0 }} // Ajusta el espacio entre el checkbox y el texto
                                         />
                                     </label>
                                 </div>
+                            </div>
 
-                                <div className="control mr-1">
-                                    <label className="checkbox">
-                                        Client Adviser
+                            <div className="field">
+                                <div className="control" style={{ minWidth: 100 }}>
+                                    <label className="checkbox" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                        Finito:
                                         <input
                                             type="checkbox"
-                                            name="clientAdviser"
-                                            checked={formData2.clientAdviser || false}
+                                            name="finished"
+                                            checked={formData2.finished || false}
                                             onChange={handleChange}
-                                            className='ml-2'
+                                            style={{ maxWidth: 50, margin: 0 }} // Ajusta el espacio entre el checkbox y el texto
                                         />
                                     </label>
                                 </div>
                             </div>
                         </form>
                     </FormProvider>
+
 
                 </section>
                 <footer className="modal-card-foot" style={{ backgroundColor: '#00D1B2' }}>
@@ -232,7 +231,7 @@ function ModalEdit({ formData, closeModal, isActive }) {
                     </div>
                 </footer>
             </div>
-        </div >
+        </div>
     );
 }
 

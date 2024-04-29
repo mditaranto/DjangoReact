@@ -3,7 +3,6 @@ import api from '../../api';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { Input } from './Input';
-import '../../styles/Switch.css';
 
 function FormOrder() {
     const methods = useForm();
@@ -22,13 +21,13 @@ function FormOrder() {
         const inputValue = type === 'checkbox' ? checked : value;
         setFormData({ ...formData, [name]: inputValue });
     };
-    
 
     const handleSubmit = methods.handleSubmit(async (e) => {
-        console.log(formData);
-        try {
+
+        try {                       
             await api.post('/api/orders/', formData);
             alert('Order created successfully');
+            navigate('/'); // Redirigir a la página principal
         } catch (error) {
             alert('An error occurred while creating the order');
         }
@@ -50,9 +49,9 @@ function FormOrder() {
                     </div>
 
                     <FormProvider {...methods}>
-                        <form onSubmit={e => e.preventDefault()} noValidate className="box p-5" style={{ margin: 0 }} id='formulario'>
+                        <form onSubmit={e => e.preventDefault()} noValidate className="box p-5">
                             {/* Formulario */}
-                            <div className="field mb-4 is-grouped" style={{ justifyContent: 'space-between' }}>
+                            <div className="field mb-4 is-grouped" style={{justifyContent:'space-between'}}>
                                 <Input
                                     label="Nome"
                                     type="text"
@@ -62,11 +61,11 @@ function FormOrder() {
                                     onChange={handleChange}
                                 />
                                 <div className="flex flex-col w-full gap-2">
-                                    <label htmlFor="Cognome" className="label is-small">
+                                    <label htmlFor="Cognome" className="label is-small" style={{margin:'0'}}>
                                         Cognome
                                     </label>
                                     <input
-                                        className='input is-medium'
+                                        className='input'
                                         type="text"
                                         name="surnameCustomer"
                                         placeholder="Cognome"
@@ -81,7 +80,7 @@ function FormOrder() {
                                     Telefono
                                 </label>
                                 <input
-                                    className='input is-medium'
+                                    className='input'
                                     type="text"
                                     name="phoneNumber"
                                     placeholder="Telefono"
@@ -132,7 +131,7 @@ function FormOrder() {
                                         Pezzo
                                     </label>
                                     <input
-                                        className='input is-medium'
+                                        className='input'
                                         type="text"
                                         name="pieceName"
                                         placeholder="Pezzo"
@@ -145,7 +144,7 @@ function FormOrder() {
                                         Costo
                                     </label>
                                     <input
-                                        className='input is-medium'
+                                        className='input'
                                         placeholder="Costo"
                                         type="number"
                                         name="price"
@@ -198,7 +197,7 @@ function FormOrder() {
                                 <label className="label is-small">Note</label>
                                 <div className="control">
                                     <textarea
-                                        className="textarea is-medium"
+                                        className="textarea"
                                         name="notes"
                                         value={formData.notes || ''}
                                         onChange={handleChange}
@@ -209,50 +208,33 @@ function FormOrder() {
                             </div>
 
                             {/* Checkboxes */}
-                            <div className="field mb-4 is-justify-content-space-between">
-
-                            </div>
-                            <div className="field mb-4 is-justify-content-space-between" style={{ flexDirection: 'row' }}>
-                                <div className="control ml-1" style={{ width: '50%' }}>
-                                    <div className='label is-justify-content-space-evenly' style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                                        Client Advised
-                                        <div class="toggle-button-cover" id='button-4'>
-                                            <div class="button-cover" style={{ display: 'flex', justifyContent: 'center' }}>
-                                                <div class="button r" id="button-4">
-                                                    <input type="checkbox" class="checkbox" id='button-4'
-                                                        onChange={handleChange}
-                                                        name="clientAdviser"
-                                                        checked={formData.clientAdviser || false}
-                                                    />
-                                                    <div class="knobs" id='button-4'></div>
-                                                    <div class="layer" id='button-4'></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div className="field mb-4 is-grouped is-justify-content-space-between">
+                                <div className="control ml-1">
+                                    <label className="checkbox">
+                                        Garanzia
+                                        <input
+                                            type="checkbox"
+                                            name="guarantee"
+                                            checked={formData.guarantee || false}
+                                            onChange={handleChange}
+                                            className='ml-2'
+                                        />
+                                    </label>
                                 </div>
 
-                                <div className="control ml-1" style={{ width: '50%' }}>
-                                    <label className="label is-justify-content-space-evenly" style={{ display: 'flex', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
-                                        Garanzia
-                                        <div class="toggle-button-cover" id='button-4'>
-                                            <div class="button-cover" style={{ display: 'flex', justifyContent: 'center' }}>
-                                                <div class="button r" id="button-4">
-                                                    <input type="checkbox" class="checkbox" id='button-4'
-                                                        onChange={handleChange}
-                                                        name="guarantee"
-                                                        checked={formData.guarantee || false}
-                                                    />
-                                                    <div class="knobs" id='button-4'></div>
-                                                    <div class="layer" id='button-4'></div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div className="control mr-1">
+                                    <label className="checkbox">
+                                        Client Adviser
+                                        <input
+                                            type="checkbox"
+                                            name="clientAdviser"
+                                            checked={formData.clientAdviser || false}
+                                            onChange={handleChange}
+                                            className='ml-2'
+                                        />
                                     </label>
                                 </div>
                             </div>
-
-
 
                             {/* Botón de envío */}
                             <div className="m-3 columns is-justify-content-center is-align-items-center">
@@ -262,7 +244,7 @@ function FormOrder() {
                     </FormProvider>
                 </div>
             </div>
-        </div >
+        </div>
     );
 }
 

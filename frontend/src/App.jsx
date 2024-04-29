@@ -6,7 +6,6 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import CreateOrder from "./pages/CreateOrderPage";
 import ProtectedRoute from "./components/Utils/ProtectedRoute";
-import Test from "./pages/Test";
 
 function Logout() {
   localStorage.clear()
@@ -32,18 +31,11 @@ function App() {
             <CreateOrder />
           </ProtectedRoute>
         } />
-
-
         <Route path="/orders" element={<Navigate to="/" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterAndLogout />} />
         <Route path="*" element={<NotFound />}></Route>
-        <Route path="/test" element={
-        <ProtectedRoute>
-        <Test />
-        </ProtectedRoute>
-        } />
       </Routes>
     </BrowserRouter>
   )

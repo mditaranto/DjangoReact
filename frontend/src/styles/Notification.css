@@ -1,20 +1,27 @@
-.notification-centered {
-    position: fixed;
-    top: 15%; /* Ajusta el margen superior según sea necesario */
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 30px; /* Ajusta el padding según sea necesario */
-    z-index: 1000; /* Establece un z-index alto para mostrar la notificación por encima de otros elementos */
-    max-width: 80%; /* Ajusta el ancho máximo según sea necesario */
-    width: auto; /* Ajusta el ancho automáticamente según el contenido */
-    /* Sombra para la notificación */
-    /* Borde interno */
-    border: 2px solid transparent;
-    border-radius: 4px; /* Ajusta el radio del borde según sea necesario */
-    box-sizing: border-box;
-    overflow: hidden;
+
+/* Estilo para aplicar un tema oscuro a las alertas de SweetAlert2 */
+/* Clase CSS para el modo oscuro */
+.swal2-dark {
+    background-color: #2c2c2c; /* Fondo oscuro */
+    color: #f1f1f1; /* Texto claro */
+    /* Otros estilos para el modo oscuro */
 }
 
-.notification-centered strong {
-    text-transform: uppercase;
+/* Clase CSS para el modo claro */
+.swal2-light {
+    background-color: #ffffff; /* Fondo claro */
+    color: #000000; /* Texto oscuro */
+    /* Otros estilos para el modo claro */
+}
+
+
+/* Aplica el estilo oscuro al contenedor de SweetAlert2 */
+.swal2-container.swal2-backdrop-show {
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro con transparencia */
+}
+
+/* Personaliza el color de los botones en el tema oscuro */
+.swal2-styled.swal2-confirm, .swal2-styled.swal2-cancel {
+    background-color: #3085d6; /* Botón azul */
+    color: #f1f1f1; /* Texto claro en los botones */
 }

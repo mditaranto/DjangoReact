@@ -2,19 +2,18 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { gsap } from "gsap";
 import ModalEdit from "../Forms/ModalEditOrder";
 import Pagination from "../Utils/Pagination";
+import Swal from 'sweetalert2'
+import "../../styles/Notification.css"
 import api from "../../api";
 
-function Order({ orders, fetchData, tableTab, setNotificationMessage, setNotificationType, setShowNotification }) {
+function Order({ orders, fetchData, tableTab }) {
     // Estado de la expansión de cada fila
     const [expandedRows, setExpandedRows] = useState({});
-
     // Estado del modal de edición
     const [isModalActive, setIsModalActive] = useState(false);
-
     // Estado de los pedidos según su estado
     const [unfinishedOrders, setUnfinishedOrders] = useState([]);
     const [finishedOrders, setFinishedOrders] = useState([]);
-
     // Estados para recordar la página actual de cada pestaña
     const [currentPageUnfinished, setCurrentPageUnfinished] = useState(1);
     const [currentPageFinished, setCurrentPageFinished] = useState(1);
@@ -26,20 +25,39 @@ function Order({ orders, fetchData, tableTab, setNotificationMessage, setNotific
     const currentUnfinishedOrders = unfinishedOrders.slice((currentPageUnfinished - 1) * ordersPerPage, currentPageUnfinished * ordersPerPage);
     const currentFinishedOrders = finishedOrders.slice((currentPageFinished - 1) * ordersPerPage, currentPageFinished * ordersPerPage);
 
-    // Invertir el orden de `orders` antes de filtrarlos
-    const reversedOrders = [...orders].reverse();
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const [isDarkMode, setIsDarkMode] = useState(darkModeMediaQuery.matches);
 
+    // Filtrar los pedidos según su estado
     useEffect(() => {
-        if (orders && Array.isArray(orders)) {
-            setUnfinishedOrders(reversedOrders.filter((order) => !order.finished));
-            setFinishedOrders(reversedOrders.filter((order) => order.finished));
+        if (Array.isArray(orders)) {
+            const unfinished = orders.filter(order => !order.finished);
+            const finished = orders.filter(order => order.finished);
+            setUnfinishedOrders(unfinished);
+            setFinishedOrders(finished);
         } else {
             setUnfinishedOrders([]);
             setFinishedOrders([]);
         }
     }, [orders]);
 
-    // Función para formatear la fecha
+    useEffect(() => {
+        // Función de callback que se ejecuta cuando cambia la preferencia de esquema de color
+        const handleColorSchemeChange = (event) => {
+            setIsDarkMode(event.matches);
+        };
+
+        // Añadir el evento de escucha a darkModeMediaQuery
+        darkModeMediaQuery.addEventListener('change', handleColorSchemeChange);
+
+        // Limpiar el evento de escucha cuando el componente se desmonte
+        return () => {
+            darkModeMediaQuery.removeEventListener('change', handleColorSchemeChange);
+        };
+    }, []);
+
+
+    // Formatear fecha
     const formatDate = (dateString) => {
         const options = { day: 'numeric', month: 'short', year: 'numeric' };
         return new Date(dateString).toLocaleDateString("it-IT", options);
@@ -52,20 +70,68 @@ function Order({ orders, fetchData, tableTab, setNotificationMessage, setNotific
         2: "In shop"
     };
 
-    // Manejar el finalizado del pedido
-    const handleFinishOrder = async (idOrder) => {
-        setShowNotification(true);
-        try {
-            console.log(idOrder);
-            await api.put(`/api/orders/${idOrder}/`, { finished: true });
-            fetchData();
-            setNotificationMessage("Order marked as finished");
-            setNotificationType("success");
-        } catch (error) {
-            setNotificationMessage("Order can't be marked as finished");
-            setNotificationType("danger");
+    // Confirmacion de eliminacion
+    const handleChoice = async (order) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You will can change it later",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, changed it!',
+            customClass: isDarkMode ? 'swal2-dark' : '',
+        });
+
+        if (result.isConfirmed) {
+            // Lógica para manejar la confirmación
+            handleFinishOrder(order);
         }
     };
+
+    // Manejar el finalizado del pedido
+    const handleFinishOrder = async (order) => {
+        try {
+            if (order.finished === false) {
+                await api.put(`/api/orders/${order.idOrder}/`, { finished: true });
+                // Muestra una notificación de éxito con SweetAlert2 que se cierra automáticamente después de 3 segundos
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Order marked as finished',
+                    text: 'The order has been successfully marked as finished.',
+                    timer: 3000, // Cierra automáticamente después de 3 segundos (3000 milisegundos)
+                    timerProgressBar: true, // Muestra una barra de progreso mientras cuenta el tiempo
+                    customClass: 'swal2-dark',
+
+                });
+            } else {
+                await api.put(`/api/orders/${order.idOrder}/`, { finished: false });
+                // Muestra una notificación de advertencia con SweetAlert2 que se cierra automáticamente después de 3 segundos
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Order marked as unfinished',
+                    text: 'The order has been marked as unfinished and can be updated.',
+                    timer: 3000, // Cierra automáticamente después de 3 segundos
+                    timerProgressBar: true, // Muestra una barra de progreso mientras cuenta el tiempo
+                    customClass: 'swal2-dark',
+
+                });
+            }
+            // Vuelve a cargar los datos después de actualizar el pedido
+            fetchData();
+
+        } catch (error) {
+            // Muestra una notificación de error con SweetAlert2 que se cierra automáticamente después de 3 segundos
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "Order can't be changed",
+                timer: 3000, // Cierra automáticamente después de 3 segundos
+                timerProgressBar: true, // Muestra una barra de progreso mientras cuenta el tiempo
+            });
+        }
+    };
+
 
     // Alternar la expansión de una fila específica
     const handleRowClick = (idOrder) => {
@@ -115,6 +181,7 @@ function Order({ orders, fetchData, tableTab, setNotificationMessage, setNotific
                     <tr>
                         <th>Order Date</th>
                         <th>Customer</th>
+                        <th>Phone Number</th>
                         <th>Piece Name</th>
                         <th>Status</th>
                         <th>Model Phone</th>
@@ -130,6 +197,7 @@ function Order({ orders, fetchData, tableTab, setNotificationMessage, setNotific
                             <tr onClick={() => handleRowClick(order.idOrder)} style={{ cursor: "pointer" }}>
                                 <td>{formatDate(order.createdAt)}</td>
                                 <td>{order.nameCustomer} {order.surnameCustomer}</td>
+                                <td>{order.phoneNumber}</td>
                                 <td>{order.pieceName}</td>
                                 <td>{order.status}</td>
                                 <td>{order.modelPhone}</td>
@@ -137,10 +205,10 @@ function Order({ orders, fetchData, tableTab, setNotificationMessage, setNotific
                                 <td>{shippedStatus[order.shipped]}</td>
                                 <td>
                                     <button
-                                        className="mr-3 fa fa-edit" // Clase CSS para el ícono de editar
+                                        className="mr-3 fa fa-edit"
                                         style={{ color: "#FFF177" }}
                                         onClick={(e) => {
-                                            e.stopPropagation(); // Evita la expansión de la fila al hacer clic
+                                            e.stopPropagation();
                                             setIsModalActive(true);
                                         }}
                                     >
@@ -149,16 +217,33 @@ function Order({ orders, fetchData, tableTab, setNotificationMessage, setNotific
                                         closeModal={() => setIsModalActive(false)} formData={order} />}
                                     {!order.finished && (
                                         <button
-                                            className="fa fa-check-square" // Clase CSS para el ícono de finalizar
+                                            className="fa fa-check-square"
                                             style={{ color: "#63E6BE" }}
-                                            onClick={() => handleFinishOrder(order.idOrder)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleChoice(order)
+                                            }}
                                         >
                                         </button>
                                     )}
+                                    {
+                                        // Si el pedido está terminado, muestra un botón para volver a ponerlo como no terminado
+                                        order.finished && (
+                                            <button
+                                                className="fa fa-undo" // Clase CSS para el ícono de deshacer (o similar)
+                                                style={{ color: "#E06D5B" }} // Puedes elegir un color diferente
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleChoice(order)
+                                                }} // Llama a la función handleUnfinishedOrder al hacer clic
+                                            >
+                                            </button>
+                                        )
+                                    }
                                 </td>
                             </tr>
 
-                            {/* Información adicional cuando la fila está expandida */}
+                            {/* Información adicional */}
                             <tr>
                                 <td colSpan="8" style={{ padding: 0, border: 0 }}>
                                     <div
@@ -202,7 +287,7 @@ function Order({ orders, fetchData, tableTab, setNotificationMessage, setNotific
                     ))}
                 </tbody>
             </table>
-                        
+
             {/* Paginación */}
             <Pagination
                 ordersPerPage={ordersPerPage}

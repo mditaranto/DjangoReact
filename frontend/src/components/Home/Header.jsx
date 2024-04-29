@@ -3,34 +3,23 @@ import { Link } from "react-router-dom";
 import api from "../../api";
 import Papa from "papaparse";
 import Order from "../Models/Order";
-import Notification from "../Utils/Notification";
+import Customer from "../Models/Customer";
+import Searchbar from "../Utils/SearchBar";
+import Phone from "../Models/Phone";
+import Piece from "../Models/Piece";
 
-function Header({ orders, fetchData }) {
+function Header({ orders, originalOrders, setOrders, fetchData }) {
+    const [navTab, setNavTab] = useState("pane-1");
+    const [tableTab, setTableTab] = useState("unfinished");
+    const [isMenuActive, setIsMenuActive] = useState(false);
+    const [isDocsActive, setIsDocsActive] = useState(false); // Estado para controlar la visibilidad de `Docs`
 
-    // Estado para controlar la pestaña activa
-    const [navTab, setNavTab] = useState('pane-1');
-    // Estado para controlar la pestaña de la tabla orders
-    const [tableTab, setTableTab] = useState('unfinished');
-
-    // Define el estado de la notificación
-    const [showNotification, setShowNotification] = useState(false);
-    const [notificationMessage, setNotificationMessage] = useState("");
-    const [notificationType, setNotificationType] = useState("primary");
-
-    // Función para exportar datos de `api/orders` a un archivo CSV
     const exportToCSV = async () => {
         try {
-            // Obtener datos de `api/orders`
             const response = await api.get("api/orders/");
             const orders = response.data;
-
-            // Convertir los datos a un archivo CSV usando `papaparse`
             const csv = Papa.unparse(orders);
-
-            // Crear un blob con el contenido CSV
             const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-
-            // Crear un enlace para descargar el archivo
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
             link.setAttribute("download", "orders.csv");
@@ -43,176 +32,218 @@ function Header({ orders, fetchData }) {
         }
     };
 
+    const toggleMenu = () => {
+        setIsMenuActive(!isMenuActive);
+    };
+
+    const toggleDocsMenu = () => {
+        setIsDocsActive(!isDocsActive);
+    };
+
     return (
         <div>
-            {/* Navbar */}
-            <nav className="navbar is-primary">
+            <nav className="navbar is-primary" role="navigation" aria-label="main navigation">
                 <div className="navbar-brand">
-                    <div className="navbar-burger burger" data-target="navbarData">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
+                    <a
+                        role="button"
+                        className={`navbar-burger burger ${isMenuActive ? "is-active" : ""}`}
+                        aria-label="menu"
+                        aria-expanded="false"
+                        data-target="navbarMenu"
+                        onClick={toggleMenu}
+                    >
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
                 </div>
-                <div id="navbarData" className="navbar-menu">
-                    <div className="navbar-start is-link">
-                        <Link className="navbar-item" to="/">Home</Link>
-                        <div className="navbar-item has-dropdown is-hoverable">
-                            <a className="navbar-link" href="/documentation/overview/start/">Docs</a>
-                            <div className="navbar-dropdown is-boxed">
+
+                <div id="navbarMenu" className={`navbar-menu ${isMenuActive ? "is-active" : ""}`}>
+                    <div className="navbar-start">
+                        <div className="navbar-item is-hoverable">
+                            <Link className="navbar-item" to="/">Home</Link>
+
+                            <p className="navbar-link" onClick={toggleDocsMenu}>
+                                Docs
+                            </p>
+                            <div className={`navbar-dropdown is-boxed ${isDocsActive ? "" : "is-hidden"}`}>
                                 <a className="navbar-item" href="admin.html">Admin</a>
                                 <a className="navbar-item" href="cover.html">Support</a>
                             </div>
                         </div>
                     </div>
+
                     <div className="navbar-end">
                         <div className="navbar-item">
-                            <div className="field is-grouped">
-                                <p className="control">
-                                    {/* Botón de Download Data con evento onClick */}
-                                    <button className="button is-link" onClick={exportToCSV}>
-                                        <span className="icon"><i className="fas fa-download"></i></span>
-                                        <span>Download Data</span>
-                                    </button>
-                                </p>
-                                <p className="control">
-                                    <Link className="button is-danger" to="/logout">
-                                        <span className="icon"><i className="fa fa-user-times"></i></span>
-                                        <span>Log out</span>
-                                    </Link>
-                                </p>
+                            <div className="buttons">
+                                <button className="button is-link" onClick={exportToCSV}>
+                                    <span className="icon">
+                                        <i className="fas fa-download"></i>
+                                    </span>
+                                    <span>Download Data</span>
+                                </button>
+                                <Link className="button is-danger" to="/logout">
+                                    <span className="icon">
+                                        <i className="fa fa-user-times"></i>
+                                    </span>
+                                    <span>Log out</span>
+                                </Link>
                             </div>
                         </div>
                     </div>
                 </div>
             </nav>
 
-            {/* Hero section */}
             <section className="hero is-primary">
                 <div className="container m-1">
-                    <img src={"/public/img/logo.png"} alt="site-logo" className="py-2 px-2" style={{ maxHeight: 90 }} />
+                    <img
+                        src={"/public/img/logo.png"}
+                        alt="site-logo"
+                        className="py-2 px-2"
+                        style={{ maxHeight: 90 }}
+                    />
                 </div>
             </section>
 
-            {/* Main Content */}
             <div>
-                {/* Tabs Tables */}
                 <nav className="mt-2 tabs is-medium is-centered nav-menu" id="nav">
                     <ul>
-                        <li onClick={() => setNavTab('pane-1')} className={navTab === 'pane-1' ? 'is-active' : ''}>
+                        <li onClick={() => setNavTab("pane-1")} className={navTab === "pane-1" ? "is-active" : ""}>
                             <a>
-                                <span className="icon is-small"><i className="fa fa-envelope"></i></span>
-                                <span>Orders</span>
+                                <span className="icon is-small">
+                                    <i className="fa fa-envelope"></i>
+                                </span>
+                                <span>Ordini</span>
                             </a>
                         </li>
-                        <li onClick={() => setNavTab('pane-2')} className={navTab === 'pane-2' ? 'is-active' : ''}>
+                        <li onClick={() => setNavTab("pane-2")} className={navTab === "pane-2" ? "is-active" : ""}>
                             <a>
-                                <span className="icon is-small"><i className="fa fa-users"></i></span>
-                                <span>Customers</span>
+                                <span className="icon is-small">
+                                    <i className="fa fa-users"></i>
+                                </span>
+                                <span>Clientela</span>
                             </a>
                         </li>
-                        <li onClick={() => setNavTab('pane-3')} className={navTab === 'pane-3' ? 'is-active' : ''}>
+                        <li onClick={() => setNavTab("pane-3")} className={navTab === "pane-3" ? "is-active" : ""}>
                             <a>
-                                <span className="icon is-small"><i className="fa fa-mobile"></i></span>
-                                <span>Mobiles</span>
+                                <span className="icon is-small">
+                                    <i className="fa fa-mobile"></i>
+                                </span>
+                                <span>Telefono</span>
                             </a>
                         </li>
-                        <li onClick={() => setNavTab('pane-4')} className={navTab === 'pane-4' ? 'is-active' : ''}>
+                        <li onClick={() => setNavTab("pane-4")} className={navTab === "pane-4" ? "is-active" : ""}>
                             <a>
-                                <span className="icon is-small"><i className="fa fa-screwdriver"></i></span>
-                                <span>Pieces</span>
+                                <span className="icon is-small">
+                                    <i className="fa fa-screwdriver"></i>
+                                </span>
+                                <span>Pezzo</span>
                             </a>
                         </li>
                     </ul>
                 </nav>
-            </div>
 
-            {/* Renderización condicional de Notification */}
-            {showNotification && (
-                <Notification
-                    message={notificationMessage}
-                    onClose={() => setShowNotification(false)}
-                    type={notificationType}
-                />
-            )}
-
-            {/* Content for each tab */}
-            <div className="tab-content mt-5" style={{ display: "block" }}>
-                <div className="tab-pane">
-                    <div className="container">
-                        <div className="columns is-centered">
-                            <div className="column is-10">
-                                {(() => {
-                                    switch (navTab) {
-                                        case 'pane-1':
-                                            return (
-                                                <div>
-                                                    <div className="navbar-menu">
-                                                        <div className="navbar">
-                                                            <a className={`navbar-item ${tableTab === 'unfinished' ? 'is-active' : ''}
-                                                          is-primary`} onClick={() => setTableTab('unfinished')}>
-                                                                Unfinished Orders
-                                                            </a>
-                                                            <a className={`navbar-item ${tableTab === 'finished' ? 'is-active' : ''}
-                                                          is-primary`} onClick={() => setTableTab('finished')}>
-                                                                Finished Orders
-                                                            </a>
+                <div className="tab-content mt-5 ">
+                    <div className="tab-pane">
+                        <div className="container">
+                            <div className="columns is-centered">
+                                <div className="column">
+                                    {(() => {
+                                        switch (navTab) {
+                                            case "pane-1":
+                                                return (
+                                                    <div>
+                                                        <div className="columns">
+                                                            <div className="navbar">
+                                                                <a
+                                                                    className={`navbar-item ${tableTab === "unfinished" ? "is-active" : ""}`}
+                                                                    onClick={() => setTableTab("unfinished")}
+                                                                >
+                                                                    Unfinished Orders
+                                                                </a>
+                                                                <a
+                                                                    className={`navbar-item ${tableTab === "finished" ? "is-active" : ""}`}
+                                                                    onClick={() => setTableTab("finished")}
+                                                                >
+                                                                    Finished Orders
+                                                                </a>
+                                                            </div>
+                                                            <div className="columns control ml-auto">
+                                                                <div className="column ">
+                                                                    <Searchbar
+                                                                        originalOrders={originalOrders}
+                                                                        setOrders={setOrders}
+                                                                        navTab={navTab}
+                                                                    />
+                                                                </div>
+                                                                <div className="column">
+                                                                    <Link className="button is-success" to="/orders/create">
+                                                                        <span className="icon">
+                                                                            <i className="fas fa-plus-circle"></i>
+                                                                        </span>
+                                                                        <span>Create Order</span>
+                                                                    </Link>
+                                                                </div>
+                                                            </div>
                                                         </div>
 
-                                                        {/* Create order button */}
-                                                        <p className="control ml-auto">
-                                                            <Link className="button is-success" to="/orders/create">
-                                                                <span className="icon"><i className="fas fa-plus-circle"></i></span>
-                                                                <span>Create Order</span>
-                                                            </Link>
-                                                        </p>
-
+                                                        <div className="table-container is-justify-content-center mb-6">
+                                                            <Order orders={orders} fetchData={fetchData} tableTab={tableTab} />
+                                                        </div>
                                                     </div>
-
-                                                    <div className="table-container is-justify-content-center mb-6">
-                                                        <Order orders={orders} fetchData={fetchData} tableTab={tableTab}
-                                                            setNotificationMessage={setNotificationMessage}
-                                                            setNotificationType={setNotificationType}
-                                                            setShowNotification={setShowNotification}
-                                                        ></Order>
-
+                                                );
+                                            case "pane-2":
+                                                return <div>
+                                                    <div className="columns">
+                                                        <div className="column" style={{ maxWidth: 300 }}>
+                                                            <Searchbar
+                                                                originalOrders={originalOrders}
+                                                                setOrders={setOrders}
+                                                                navTab={navTab}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <Customer orders={orders} />
+                                                </div>;
+                                            case "pane-3":
+                                                return <div>
+                                                    <div className="columns">
+                                                        <div className="column" style={{ maxWidth: 300 }}>
+                                                            <Searchbar
+                                                                originalOrders={originalOrders}
+                                                                setOrders={setOrders}
+                                                                navTab={navTab}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <Phone orders={orders} />
+                                                </div>;
+                                            case "pane-4":
+                                                return <div>
+                                                <div className="columns">
+                                                    <div className="column" style={{ maxWidth: 300 }}>
+                                                        <Searchbar
+                                                            originalOrders={originalOrders}
+                                                            setOrders={setOrders}
+                                                            navTab={navTab}
+                                                        />
                                                     </div>
                                                 </div>
-                                            );
-                                        case 'pane-2':
-                                            return (
-                                                <div>
-
-                                                </div>
-                                            );
-                                        case 'pane-3':
-                                            return (
-                                                <div>
-                                                    {/* Contenido de la pestaña Orders */}
-                                                    <h2>Orders</h2>
-                                                    <p>Contenido específico de la pestaña Orders.</p>
-                                                </div>
-                                            );
-                                        case 'pane-4':
-                                            return (
-                                                <div>
-                                                    {/* Contenido de la pestaña Orders */}
-                                                    <h2>Orders</h2>
-                                                    <p>Contenido específico de la pestaña Orders.</p>
-                                                </div>
-                                            );
-                                        default:
-                                            return null; // Manejo de casos no previstos
-                                    }
-                                })()}
+                                                <Piece orders={orders} />
+                                            </div>;
+                                            default:
+                                                return null;
+                                        }
+                                    })()}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     );
 }
 
 export default Header;
+
