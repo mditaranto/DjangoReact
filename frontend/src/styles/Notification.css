@@ -1,0 +1,20 @@
+.notification-centered {
+    position: fixed;
+    top: 15%; /* Ajusta el margen superior según sea necesario */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 30px; /* Ajusta el padding según sea necesario */
+    z-index: 1000; /* Establece un z-index alto para mostrar la notificación por encima de otros elementos */
+    max-width: 80%; /* Ajusta el ancho máximo según sea necesario */
+    width: auto; /* Ajusta el ancho automáticamente según el contenido */
+    /* Sombra para la notificación */
+    /* Borde interno */
+    border: 2px solid transparent;
+    border-radius: 4px; /* Ajusta el radio del borde según sea necesario */
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.notification-centered strong {
+    text-transform: uppercase;
+}
