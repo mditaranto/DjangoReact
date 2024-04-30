@@ -20,11 +20,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-kkcb6x^!q@n2*075f=d=fc9ocu#3fyxw+8_)i8la5or$5#n8la'
 
@@ -48,7 +43,6 @@ SIMPLE_JWT = {
 }
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -60,8 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "api",
     "rest_framework",
-    "corsheaders",
-    "dotenv",
+    "corsheaders"
 ]
 
 MIDDLEWARE = [
@@ -73,11 +66,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
-]
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    # Aquí puedes agregar otros orígenes permitidos si es necesario
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -106,12 +94,8 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv("DB_NAME"),
-        'USER': os.getenv("DB_USER"),
-        'PASSWORD': os.getenv("DB_PWD"),
-        'HOST': os.getenv("DB_HOST"),
-        'PORT': os.getenv("DB_PORT"),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'mbdb/db.sqlite3',
     }
 }
 
